@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oliver's Games</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      background: white;
+      color: black;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .back-btn:hover {
+      background: #ddd;
+    }
+
+    /* ===== HOME ===== */
+    #homeScreen {
+      background: #111;
+      color: white;
+    }
+
+    #homeScreen h1 {
+      margin-top: 30px;
+      font-size: 46px;
+    }
+
+    #homeScreen p {
+      color: #ccc;
+      margin-bottom: 30px;
+    }
+
+    #gamesList {
+      width: 90%;
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .game-link {
+      display: block;
+      background: #222;
+      color: white;
+      text-decoration: none;
+      padding: 18px;
+      border-radius: 12px;
+      font-size: 24px;
+      font-weight: bold;
+      border: 2px solid #444;
+      cursor: pointer;
+    }
+
+    .game-link:hover {
+      background: #333;
+      border-color: #888;
+    }
+
+    /* ===== COOKIE CLICKER ===== */
+    #cookieScreen {
+      background: #fff3cd;
+      color: black;
+    }
+
+    #cookieScreen h1 {
+      margin-top: 40px;
+    }
+
+    #cookieScore {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 20px;
+    }
+
+    #cookieButton {
+      font-size: 80px;
+      padding: 40px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: #d2691e;
+      box-shadow: 0 6px #8b4513;
+    }
+
+    #cookieButton:active {
+      box-shadow: 0 2px #8b4513;
+      transform: translateY(4px);
+    }
+
+    #cookieUpgrade {
+      margin-top: 30px;
+      padding: 15px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #4caf50;
+      color: white;
+    }
+
+    #cookieUpgrade:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+
+    /* ===== DOGER 1 ===== */
+    #dogerScreen {
+      background: #111;
+      color: white;
+      overflow: hidden;
+    }
+
+    #dogerScreen h1 {
+      margin: 10px 0 0;
+    }
+
+    #dogerScreen p {
+      margin: 5px 0 10px;
+    }
+
+    #dogerTopBar {
+      margin: 10px auto;
+      width: 520px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #dogerStats {
+      text-align: left;
+      font-size: 18px;
+    }
+
+    #dogerShop {
+      width: 520px;
+      margin: 10px auto;
+      background: #222;
+      border: 2px solid white;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    #dogerShop h2 {
+      margin: 0 0 10px 0;
+      font-size: 22px;
+    }
+
+    #dogerSkins {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .skin-btn {
+      padding: 8px 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 6px;
+      min-width: 110px;
+    }
+
+    #dogerCanvas {
+      background: #222;
+      display: block;
+      margin: 0 auto 20px auto;
+      border: 2px solid white;
+    }
+
+    #dogerMessage {
+      margin-top: 10px;
+      min-height: 24px;
+      font-size: 18px;
+    }
+
+    /* ===== SNAKE 2 ===== */
+    #snakeScreen {
+      background: #111;
+      color: white;
+    }
+
+    #snakeScreen h1 {
+      margin: 12px 0 6px;
+    }
+
+    #snakeScreen p {
+      margin: 0 0 10px;
+    }
+
+    #snakeControls {
+      margin: 10px 0;
+    }
+
+    .mode-btn {
+      margin: 4px;
+      padding: 10px 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #snakeNormalBtn {
+      background: #444;
+      color: white;
+    }
+
+    #snakeForeverBtn {
+      background: #0a84ff;
+      color: white;
+    }
+
+    #snakeCanvas {
+      display: block;
+      margin: 0 auto 20px auto;
+      background: #222;
+      border: 3px solid white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HOME -->
+  <div id="homeScreen" class="screen active">
+    <h1>Oliver's Games</h1>
+    <p>Click a game to play</p>
+
+    <div id="gamesList">
+      <button class="game-link" onclick="showScreen('cookie')">Cookie Clicker</button>
+      <button class="game-link" onclick="showScreen('doger')">Doger 1</button>
+      <button class="game-link" onclick="showScreen('snake')">Snake 2</button>
+    </div>
+  </div>
+
+  <!-- COOKIE CLICKER -->
+  <div id="cookieScreen" class="screen">
+    <button class="back-btn" onclick="showScreen('home')">← Back to Oliver's Games</button>
+
+    <h1>🍪 Simple Cookie Clicker</h1>
+    <div id="cookieScore">Cookies: 0</div>
+    <button id="cookieButton">🍪</button>
+    <br>
+    <button id="cookieUpgrade">Upgrade: Double Click Power (Cost: 10 cookies)</button>
+  </div>
+
+  <!-- DOGER 1 -->
+  <div id="dogerScreen" class="screen">
+    <button class="back-btn" onclick="showScreen('home')">← Back to Oliver's Games</button>
+
+    <h1>Doger 1</h1>
+    <p>Move with Left / Right or move your mouse over the game</p>
+
+    <div id="dogerTopBar">
+      <div id="dogerStats">
+        <div>Level: <span id="dogerLevelText">1</span></div>
+        <div>Score: <span id="dogerScoreText">0</span> / 100</div>
+        <div>Coins: <span id="dogerCoinsText">0</span></div>
+        <div>Skin: <span id="dogerSkinText">white</span></div>
+      </div>
+    </div>
+
+    <div id="dogerShop">
+      <h2>Skin Shop</h2>
+      <div id="dogerSkins"></div>
+      <div id="dogerMessage"></div>
+    </div>
+
+    <canvas id="dogerCanvas" width="520" height="620"></canvas>
+  </div>
+
+  <!-- SNAKE 2 -->
+  <div id="snakeScreen" class="screen">
+    <button class="back-btn" onclick="showScreen('home')">← Back to Oliver's Games</button>
+
+    <h1>Snake 2</h1>
+    <p>Use arrow keys to move. Press R to restart.</p>
+
+    <div id="snakeControls">
+      <button class="mode-btn" id="snakeNormalBtn">Normal Mode</button>
+      <button class="mode-btn" id="snakeForeverBtn">Forever Mode</button>
+    </div>
+
+    <canvas id="snakeCanvas" width="400" height="400"></canvas>
+  </div>
+
+  <script>
+    let currentScreen = "home";
+
+    function showScreen(name) {
+      currentScreen = name;
+
+      document.getElementById("homeScreen").classList.remove("active");
+      document.getElementById("cookieScreen").classList.remove("active");
+      document.getElementById("dogerScreen").classList.remove("active");
+      document.getElementById("snakeScreen").classList.remove("active");
+
+      if (name === "home") document.getElementById("homeScreen").classList.add("active");
+      if (name === "cookie") document.getElementById("cookieScreen").classList.add("active");
+      if (name === "doger") document.getElementById("dogerScreen").classList.add("active");
+      if (name === "snake") document.getElementById("snakeScreen").classList.add("active");
+    }
+
+    /* =========================
+       COOKIE CLICKER
+    ========================= */
+    let cookieCount = 0;
+    let cookiesPerClick = 1;
+
+    const cookieScoreDisplay = document.getElementById("cookieScore");
+    const cookieButton = document.getElementById("cookieButton");
+    const cookieUpgradeButton = document.getElementById("cookieUpgrade");
+
+    function updateCookieScore() {
+      cookieScoreDisplay.textContent = "Cookies: " + cookieCount;
+    }
+
+    cookieButton.onclick = function () {
+      cookieCount += cookiesPerClick;
+      updateCookieScore();
+
+      if (cookieCount >= 10 && cookiesPerClick === 1) {
+        cookieUpgradeButton.disabled = false;
+      }
+    };
+
+    cookieUpgradeButton.onclick = function () {
+      if (cookieCount >= 10) {
+        cookieCount -= 10;
+        cookiesPerClick = 2;
+        cookieUpgradeButton.disabled = true;
+        cookieUpgradeButton.textContent = "Upgrade Purchased!";
+        updateCookieScore();
+      }
+    };
+
+    cookieUpgradeButton.disabled = true;
+    updateCookieScore();
+
+    /* =========================
+       DOGER 1
+    ========================= */
+    const dogerCanvas = document.getElementById("dogerCanvas");
+    const dogerCtx = dogerCanvas.getContext("2d");
+
+    const dogerLevelText = document.getElementById("dogerLevelText");
+    const dogerScoreText = document.getElementById("dogerScoreText");
+    const dogerCoinsText = document.getElementById("dogerCoinsText");
+    const dogerSkinText = document.getElementById("dogerSkinText");
+    const dogerMessageText = document.getElementById("dogerMessage");
+    const dogerSkinsDiv = document.getElementById("dogerSkins");
+
+    const dogerLevelGoal = 100;
+
+    const dogerSkinList = [
+      { name: "white", color: "white", cost: 0, text: "black" },
+      { name: "red", color: "red", cost: 100, text: "white" },
+      { name: "orange", color: "orange", cost: 200, text: "black" },
+      { name: "yellow", color: "yellow", cost: 300, text: "black" },
+      { name: "green", color: "green", cost: 400, text: "white" },
+      { name: "blue", color: "blue", cost: 500, text: "white" },
+      { name: "purple", color: "purple", cost: 600, text: "white" },
+      { name: "pink", color: "hotpink", cost: 700, text: "white" },
+      { name: "cyan", color: "cyan", cost: 800, text: "black" },
+      { name: "gold", color: "gold", cost: 900, text: "black" },
+      { name: "silver", color: "silver", cost: 1000, text: "black" },
+      { name: "lime", color: "lime", cost: 1100, text: "black" },
+      { name: "magenta", color: "magenta", cost: 1200, text: "white" },
+      { name: "brown", color: "saddlebrown", cost: 1300, text: "white" },
+      { name: "navy", color: "navy", cost: 1400, text: "white" }
+    ];
+
+    let dogerCoins = 0;
+    let dogerLevel = 1;
+    let dogerScore = 0;
+    let dogerGameOver = false;
+    let dogerLevelComplete = false;
+    let dogerFrameCount = 0;
+    let dogerObstacles = [];
+    let dogerMouseX = dogerCanvas.width / 2;
+    let dogerMouseControlActive = false;
+    let dogerOwnedSkins = { white: true };
+    let dogerCurrentSkin = "white";
+
+    const dogerPlayer = {
+      x: 230,
+      y: 560,
+      width: 60,
+      height: 20,
+      speed: 7
+    };
+
+    const dogerKeys = {
+      left: false,
+      right: false
+    };
+
+    function saveDogerGame() {
+      const saveData = {
+        dogerCoins,
+        dogerLevel,
+        dogerCurrentSkin,
+        dogerOwnedSkins
+      };
+      localStorage.setItem("doger1Save", JSON.stringify(saveData));
+    }
+
+    function loadDogerGame() {
+      const saved = localStorage.getItem("doger1Save");
+      if (!saved) return;
+
+      try {
+        const data = JSON.parse(saved);
+        dogerCoins = data.dogerCoins ?? 0;
+        dogerLevel = data.dogerLevel ?? 1;
+        dogerCurrentSkin = data.dogerCurrentSkin ?? "white";
+        dogerOwnedSkins = data.dogerOwnedSkins ?? { white: true };
+
+        if (!dogerOwnedSkins.white) {
+          dogerOwnedSkins.white = true;
+        }
+      } catch (err) {
+        console.log("Save load failed");
+      }
+    }
+
+    function getDogerSkinColor(name) {
+      const skin = dogerSkinList.find(s => s.name === name);
+      return skin ? skin.color : "white";
+    }
+
+    function showDogerMessage(text) {
+      dogerMessageText.textContent = text;
+    }
+
+    function updateDogerUI() {
+      dogerLevelText.textContent = dogerLevel;
+      dogerScoreText.textContent = dogerScore;
+      dogerCoinsText.textContent = dogerCoins;
+      dogerSkinText.textContent = dogerCurrentSkin;
+      renderDogerShop();
+    }
+
+    function renderDogerShop() {
+      dogerSkinsDiv.innerHTML = "";
+
+      for (const skin of dogerSkinList) {
+        const btn = document.createElement("button");
+        btn.className = "skin-btn";
+        btn.style.background = skin.color;
+        btn.style.color = skin.text;
+
+        let label = skin.name;
+        if (skin.cost === 0) {
+          label += " (free)";
+        } else if (dogerOwnedSkins[skin.name]) {
+          label += " (owned)";
+        } else {
+          label += " (" + skin.cost + ")";
+        }
+
+        if (dogerCurrentSkin === skin.name) {
+          label += " [using]";
+        }
+
+        btn.textContent = label;
+        btn.onclick = () => buyOrUseDogerSkin(skin.name);
+        dogerSkinsDiv.appendChild(btn);
+      }
+    }
+
+    function buyOrUseDogerSkin(name) {
+      const skin = dogerSkinList.find(s => s.name === name);
+      if (!skin) return;
+
+      if (dogerOwnedSkins[name]) {
+        dogerCurrentSkin = name;
+        showDogerMessage("Using " + name + " skin");
+      } else if (dogerCoins >= skin.cost) {
+        dogerCoins -= skin.cost;
+        dogerOwnedSkins[name] = true;
+        dogerCurrentSkin = name;
+        showDogerMessage("Bought " + name + " skin for " + skin.cost + " coins");
+      } else {
+        showDogerMessage("Need " + skin.cost + " coins for " + name);
+      }
+
+      saveDogerGame();
+      updateDogerUI();
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (currentScreen === "doger") {
+        if (e.key === "ArrowLeft") dogerKeys.left = true;
+        if (e.key === "ArrowRight") dogerKeys.right = true;
+
+        if ((e.key === "r" || e.key === "R") && dogerGameOver) {
+          restartDogerAfterLoss();
+        }
+
+        if ((e.key === "n" || e.key === "N") && dogerLevelComplete) {
+          nextDogerLevel();
+        }
+      }
+    });
+
+    document.addEventListener("keyup", (e) => {
+      if (currentScreen === "doger") {
+        if (e.key === "ArrowLeft") dogerKeys.left = false;
+        if (e.key === "ArrowRight") dogerKeys.right = false;
+      }
+    });
+
+    dogerCanvas.addEventListener("mousemove", (e) => {
+      const rect = dogerCanvas.getBoundingClientRect();
+      dogerMouseX = e.clientX - rect.left;
+      dogerMouseControlActive = true;
+    });
+
+    dogerCanvas.addEventListener("mouseleave", () => {
+      dogerMouseControlActive = false;
+    });
+
+    function getDogerObstacleSpeed() {
+      return Math.random() * 3 + 3 + (dogerLevel - 1) * 0.7;
+    }
+
+    function createDogerObstacle() {
+      const width = Math.random() * 60 + 20;
+      const x = Math.random() * (dogerCanvas.width - width);
+
+      dogerObstacles.push({
+        x: x,
+        y: -20,
+        width: width,
+        height: 20,
+        speed: getDogerObstacleSpeed(),
+        color: "tomato"
+      });
+    }
+
+    function endDogerGame() {
+      dogerGameOver = true;
+      dogerCoins += dogerScore;
+      saveDogerGame();
+      showDogerMessage("Game over. You earned " + dogerScore + " coins. Press R to retry.");
+      updateDogerUI();
+    }
+
+    function completeDogerLevel() {
+      dogerLevelComplete = true;
+      dogerCoins += 200;
+      saveDogerGame();
+      showDogerMessage("Level " + dogerLevel + " complete! +200 coins. Press N for next level.");
+      updateDogerUI();
+    }
+
+    function restartDogerAfterLoss() {
+      dogerObstacles = [];
+      dogerScore = 0;
+      dogerFrameCount = 0;
+      dogerGameOver = false;
+      dogerLevelComplete = false;
+      dogerPlayer.x = 230;
+      showDogerMessage("");
+      updateDogerUI();
+    }
+
+    function nextDogerLevel() {
+      dogerLevel++;
+      dogerObstacles = [];
+      dogerScore = 0;
+      dogerFrameCount = 0;
+      dogerGameOver = false;
+      dogerLevelComplete = false;
+      dogerPlayer.x = 230;
+      saveDogerGame();
+      showDogerMessage("Level " + dogerLevel);
+      updateDogerUI();
+    }
+
+    function moveDogerPlayer() {
+      if (dogerKeys.left && dogerPlayer.x > 0) {
+        dogerPlayer.x -= dogerPlayer.speed;
+      }
+
+      if (dogerKeys.right && dogerPlayer.x + dogerPlayer.width < dogerCanvas.width) {
+        dogerPlayer.x += dogerPlayer.speed;
+      }
+
+      if (dogerMouseControlActive) {
+        const targetX = dogerMouseX - dogerPlayer.width / 2;
+        const diff = targetX - dogerPlayer.x;
+
+        if (Math.abs(diff) > dogerPlayer.speed) {
+          dogerPlayer.x += Math.sign(diff) * dogerPlayer.speed;
+        } else {
+          dogerPlayer.x = targetX;
+        }
+      }
+
+      if (dogerPlayer.x < 0) dogerPlayer.x = 0;
+      if (dogerPlayer.x + dogerPlayer.width > dogerCanvas.width) {
+        dogerPlayer.x = dogerCanvas.width - dogerPlayer.width;
+      }
+    }
+
+    function updateDoger() {
+      if (dogerGameOver || dogerLevelComplete) return;
+
+      dogerFrameCount++;
+      moveDogerPlayer();
+
+      const spawnRate = Math.max(10, 30 - (dogerLevel - 1) * 2);
+      if (dogerFrameCount % spawnRate === 0) {
+        createDogerObstacle();
+      }
+
+      for (let i = 0; i < dogerObstacles.length; i++) {
+        dogerObstacles[i].y += dogerObstacles[i].speed;
+
+        if (
+          dogerPlayer.x < dogerObstacles[i].x + dogerObstacles[i].width &&
+          dogerPlayer.x + dogerPlayer.width > dogerObstacles[i].x &&
+          dogerPlayer.y < dogerObstacles[i].y + dogerObstacles[i].height &&
+          dogerPlayer.y + dogerPlayer.height > dogerObstacles[i].y
+        ) {
+          endDogerGame();
+          return;
+        }
+
+        if (dogerObstacles[i].y > dogerCanvas.height) {
+          dogerObstacles.splice(i, 1);
+          dogerScore++;
+          i--;
+
+          if (dogerScore >= dogerLevelGoal) {
+            completeDogerLevel();
+            return;
+          }
+        }
+      }
+
+      updateDogerUI();
+    }
+
+    function drawDogerPlayer() {
+      dogerCtx.fillStyle = getDogerSkinColor(dogerCurrentSkin);
+      dogerCtx.fillRect(dogerPlayer.x, dogerPlayer.y, dogerPlayer.width, dogerPlayer.height);
+    }
+
+    function drawDogerObstacles() {
+      for (const obstacle of dogerObstacles) {
+        dogerCtx.fillStyle = obstacle.color;
+        dogerCtx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      }
+    }
+
+    function drawDogerHud() {
+      dogerCtx.fillStyle = "white";
+      dogerCtx.font = "24px Arial";
+      dogerCtx.fillText("Level: " + dogerLevel, 20, 30);
+      dogerCtx.fillText("Score: " + dogerScore + " / " + dogerLevelGoal, 20, 60);
+      dogerCtx.fillText("Coins: " + dogerCoins, 20, 90);
+    }
+
+    function drawDogerGameOver() {
+      dogerCtx.fillStyle = "white";
+      dogerCtx.font = "38px Arial";
+      dogerCtx.fillText("Game Over", 150, 250);
+      dogerCtx.font = "24px Arial";
+      dogerCtx.fillText("Press R to Retry", 175, 295);
+      dogerCtx.fillText("Round Coins: " + dogerScore, 165, 335);
+    }
+
+    function drawDogerLevelComplete() {
+      dogerCtx.fillStyle = "white";
+      dogerCtx.font = "34px Arial";
+      dogerCtx.fillText("Level Complete!", 145, 250);
+      dogerCtx.font = "24px Arial";
+      dogerCtx.fillText("+200 Coins", 195, 290);
+      dogerCtx.fillText("Press N for Next Level", 140, 330);
+    }
+
+    function drawDoger() {
+      dogerCtx.clearRect(0, 0, dogerCanvas.width, dogerCanvas.height);
+      drawDogerPlayer();
+      drawDogerObstacles();
+      drawDogerHud();
+
+      if (dogerGameOver) drawDogerGameOver();
+      if (dogerLevelComplete) drawDogerLevelComplete();
+    }
+
+    function dogerLoop() {
+      if (currentScreen === "doger") {
+        updateDoger();
+        drawDoger();
+      }
+      requestAnimationFrame(dogerLoop);
+    }
+
+    loadDogerGame();
+    updateDogerUI();
+    dogerLoop();
+
+    /* =========================
+       SNAKE 2
+    ========================= */
+    const snakeCanvas = document.getElementById("snakeCanvas");
+    const snakeCtx = snakeCanvas.getContext("2d");
+
+    const snakeNormalBtn = document.getElementById("snakeNormalBtn");
+    const snakeForeverBtn = document.getElementById("snakeForeverBtn");
+
+    const snakeBox = 20;
+    const snakeRows = snakeCanvas.height / snakeBox;
+    const snakeCols = snakeCanvas.width / snakeBox;
+
+    let snake = [{ x: 9 * snakeBox, y: 10 * snakeBox }];
+    let snakeDirection = "RIGHT";
+    let snakeNextDirection = "RIGHT";
+    let snakeFood = randomSnakeFood();
+    let snakeScore = 0;
+    let snakeGameOver = false;
+    let snakeForeverMode = false;
+
+    snakeNormalBtn.addEventListener("click", () => {
+      snakeForeverMode = false;
+      restartSnakeGame();
+    });
+
+    snakeForeverBtn.addEventListener("click", () => {
+      snakeForeverMode = true;
+      restartSnakeGame();
+    });
+
+    function randomSnakeFood() {
+      let newFood;
+      let onSnake;
+
+      do {
+        onSnake = false;
+        newFood = {
+          x: Math.floor(Math.random() * snakeCols) * snakeBox,
+          y: Math.floor(Math.random() * snakeRows) * snakeBox
+        };
+
+        for (let part of snake) {
+          if (part.x === newFood.x && part.y === newFood.y) {
+            onSnake = true;
+            break;
+          }
+        }
+      } while (onSnake);
+
+      return newFood;
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (currentScreen !== "snake") return;
+
+      const key = event.key;
+
+      if (snakeGameOver && (key === "r" || key === "R")) {
+        restartSnakeGame();
+        return;
+      }
+
+      if (key === "ArrowUp" && snakeDirection !== "DOWN") {
+        snakeNextDirection = "UP";
+      } else if (key === "ArrowDown" && snakeDirection !== "UP") {
+        snakeNextDirection = "DOWN";
+      } else if (key === "ArrowLeft" && snakeDirection !== "RIGHT") {
+        snakeNextDirection = "LEFT";
+      } else if (key === "ArrowRight" && snakeDirection !== "LEFT") {
+        snakeNextDirection = "RIGHT";
+      }
+    });
+
+    function restartSnakeGame() {
+      snake = [{ x: 9 * snakeBox, y: 10 * snakeBox }];
+      snakeDirection = "RIGHT";
+      snakeNextDirection = "RIGHT";
+      snakeFood = randomSnakeFood();
+      snakeScore = 0;
+      snakeGameOver = false;
+    }
+
+    function snakeCollision(head, array) {
+      for (let i = 0; i < array.length; i++) {
+        if (head.x === array[i].x && head.y === array[i].y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function wrapSnakePosition(value, max) {
+      if (value < 0) return max - snakeBox;
+      if (value >= max) return 0;
+      return value;
+    }
+
+    function updateSnake() {
+      if (snakeGameOver) return;
+
+      snakeDirection = snakeNextDirection;
+
+      let headX = snake[0].x;
+      let headY = snake[0].y;
+
+      if (snakeDirection === "UP") headY -= snakeBox;
+      if (snakeDirection === "DOWN") headY += snakeBox;
+      if (snakeDirection === "LEFT") headX -= snakeBox;
+      if (snakeDirection === "RIGHT") headX += snakeBox;
+
+      if (snakeForeverMode) {
+        headX = wrapSnakePosition(headX, snakeCanvas.width);
+        headY = wrapSnakePosition(headY, snakeCanvas.height);
+      }
+
+      const newHead = { x: headX, y: headY };
+
+      if (!snakeForeverMode) {
+        if (
+          headX < 0 ||
+          headY < 0 ||
+          headX >= snakeCanvas.width ||
+          headY >= snakeCanvas.height ||
+          snakeCollision(newHead, snake)
+        ) {
+          snakeGameOver = true;
+          return;
+        }
+      } else {
+        if (snakeCollision(newHead, snake)) {
+          snake.pop();
+        }
+      }
+
+      snake.unshift(newHead);
+
+      if (headX === snakeFood.x && headY === snakeFood.y) {
+        snakeScore++;
+        snakeFood = randomSnakeFood();
+      } else {
+        snake.pop();
+      }
+    }
+
+    function drawSnakeGrid() {
+      snakeCtx.strokeStyle = "#333";
+      for (let x = 0; x <= snakeCanvas.width; x += snakeBox) {
+        snakeCtx.beginPath();
+        snakeCtx.moveTo(x, 0);
+        snakeCtx.lineTo(x, snakeCanvas.height);
+        snakeCtx.stroke();
+      }
+      for (let y = 0; y <= snakeCanvas.height; y += snakeBox) {
+        snakeCtx.beginPath();
+        snakeCtx.moveTo(0, y);
+        snakeCtx.lineTo(snakeCanvas.width, y);
+        snakeCtx.stroke();
+      }
+    }
+
+    function drawSnake() {
+      snakeCtx.clearRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+      drawSnakeGrid();
+
+      snakeCtx.fillStyle = "red";
+      snakeCtx.fillRect(snakeFood.x, snakeFood.y, snakeBox, snakeBox);
+
+      for (let i = 0; i < snake.length; i++) {
+        snakeCtx.fillStyle = i === 0 ? "lime" : "green";
+        snakeCtx.fillRect(snake[i].x, snake[i].y, snakeBox, snakeBox);
+      }
+
+      snakeCtx.fillStyle = "white";
+      snakeCtx.font = "24px Arial";
+      snakeCtx.fillText("Score: " + snakeScore, 10, 28);
+      snakeCtx.fillText(snakeForeverMode ? "Mode: Forever" : "Mode: Normal", 10, 56);
+
+      if (snakeGameOver) {
+        snakeCtx.fillStyle = "white";
+        snakeCtx.font = "36px Arial";
+        snakeCtx.fillText("Game Over", 110, 180);
+        snakeCtx.font = "22px Arial";
+        snakeCtx.fillText("Press R to Restart", 110, 220);
+      }
+    }
+
+    function snakeGameLoop() {
+      if (currentScreen === "snake") {
+        updateSnake();
+        drawSnake();
+      }
+    }
+
+    setInterval(snakeGameLoop, 180);
+  </script>
+</body>
+</html>
